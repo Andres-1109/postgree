@@ -1,0 +1,20 @@
+services:
+  db:
+    image: postgres:17
+    container_name: colombia_riwi-postgres
+
+    environment:
+      POSTGRES_DB: centurion_riwi_db
+      POSTGRES_USER: centurion
+      POSTGRES_PASSWORD: '123456'
+
+    ports:
+      - "5433:5432"
+
+    volumes:
+      - riwi-db-data:/var/lib/postgresql/data
+
+volumes:
+  riwi-db-data:
+    external: true
+    name: docker-database_riwi-db-data
