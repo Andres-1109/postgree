@@ -1,0 +1,136 @@
+====================================================================
+MODELO ENTIDAD-RELACION (MER) - RIWISUPPLY S.A.S.
+====================================================================
+
+--------------------------------------------------------------------
+1. ENTIDADES Y ATRIBUTOS
+--------------------------------------------------------------------
+
+1.1 CITY (Ciudad)
+    * id_city            [PK] - identificador unico de la ciudad
+    * name                    - nombre de la ciudad
+
+1.2 CATEGORY (Categoria)
+    * id_category        [PK] - identificador unico de la categoria
+    * name                    - nombre de la categoria
+
+1.3 SUPPLIER (Proveedor)
+    * id_supplier        [PK] - identificador unico del proveedor
+    * name                    - nombre del proveedor
+    * phone                   - telefono de contacto
+    * email                   - correo electronico
+    * id_city            [FK] - referencia a CITY
+
+1.4 PRODUCT (Producto)
+    * id_product         [PK] - identificador unico del producto
+    * name                    - nombre del producto
+    * unit_price               - precio unitario
+    * id_category        [FK] - referencia a CATEGORY
+
+1.5 WAREHOUSE (Bodega)
+    * id_warehouse       [PK] - identificador unico de la bodega
+    * name                    - nombre de la bodega
+    * address                 - direccion
+    * id_city            [FK] - referencia a CITY
+
+1.6 PURCHASE (Compra) -- Tabla puente / intermedia
+    * id_purchase        [PK] - identificador unico de la compra
+    * id_supplier        [FK] - referencia a SUPPLIER
+    * id_product         [FK] - referencia a PRODUCT
+    * quantity                - cantidad comprada
+    * purchase_date            - fecha de la compra
+    * total_value              - valor total de la compra
+
+1.7 INVENTORY_MOVEMENT (Movimiento de Inventario) -- Tabla puente / intermedia
+    * id_movement        [PK] - identificador unico del movimiento
+    * id_product         [FK] - referencia a PRODUCT
+    * id_warehouse       [FK] - referencia a WAREHOUSE
+    * movement_type            - tipo de movimiento (entrada / salida)
+    * quantity                - cantidad movida
+    * movement_date            - fecha del movimiento
+
+
+--------------------------------------------------------------------
+2. RELACIONES Y CARDINALIDAD
+--------------------------------------------------------------------
+
+    2.1 CITY -----------------< SUPPLIER
+        - Tipo        : Uno a Muchos (1:N)
+        - Descripcion : Una ciudad puede tener muchos proveedores;
+                        un proveedor pertenece a una sola ciudad.
+
+    2.2 CITY -----------------< WAREHOUSE
+        - Tipo        : Uno a Muchos (1:N)
+        - Descripcion : Una ciudad puede tener muchas bodegas;
+                        una bodega pertenece a una sola ciudad.
+
+    2.3 CATEGORY -----------------< PRODUCT
+        - Tipo        : Uno a Muchos (1:N)
+        - Descripcion : Una categoria agrupa muchos productos;
+                        un producto pertenece a una sola categoria.
+
+    2.4 SUPPLIER >-----------------< PRODUCT   (via PURCHASE)
+        - Tipo        : Muchos a Muchos (N:M)
+        - Descripcion : Un proveedor vende muchos productos;
+                        un producto puede ser vendido por varios proveedores.
+        - Resuelta por: tabla intermedia PURCHASE
+
+    2.5 PRODUCT >-----------------< WAREHOUSE   (via INVENTORY_MOVEMENT)
+        - Tipo        : Muchos a Muchos (N:M)
+        - Descripcion : Un producto puede almacenarse en varias bodegas;
+                        una bodega almacena varios productos.
+        - Resuelta por: tabla intermedia INVENTORY_MOVEMENT
+
+
+--------------------------------------------------------------------
+3. RESUMEN DE LLAVES PRIMARIAS (PK) Y FORANEAS (FK)
+--------------------------------------------------------------------
+
+    * CITY                 -> PK: id_city
+    * CATEGORY              -> PK: id_category
+    * SUPPLIER              -> PK: id_supplier   | FK: id_city -> CITY
+    * PRODUCT               -> PK: id_product    | FK: id_category -> CATEGORY
+    * WAREHOUSE             -> PK: id_warehouse  | FK: id_city -> CITY
+    * PURCHASE              -> PK: id_purchase   | FK: id_supplier -> SUPPLIER
+                                                  | FK: id_product -> PRODUCT
+    * INVENTORY_MOVEMENT    -> PK: id_movement   | FK: id_product -> PRODUCT
+                                                  | FK: id_warehouse -> WAREHOUSE
+
+
+--------------------------------------------------------------------
+4. ESQUEMA VISUAL DE REFERENCIA (texto)
+--------------------------------------------------------------------
+
+    CITY ---------+
+      |           |
+      | 1:N       | 1:N
+      v           v
+   SUPPLIER    WAREHOUSE
+      |             |
+      | N:M         | N:M
+      v             v
+   PURCHASE <---> PRODUCT <---> INVENTORY_MOVEMENT
+                    ^
+                    | N:1
+                    |
+                CATEGORY
+
+
+--------------------------------------------------------------------
+5. NOTAS PARA EL DIAGRAMA (DER) EN DRAW.IO
+--------------------------------------------------------------------
+
+    * Cada entidad se dibuja como un rectangulo con su nombre en la parte superior.
+    * Dentro del rectangulo, listar los atributos; el PK debe ir subrayado
+      o marcado en negrilla.
+    * Las relaciones se dibujan como lineas entre entidades.
+    * En cada extremo de la linea, colocar el simbolo de cardinalidad:
+        - "1"  para el lado "uno"
+        - "N" o "M" para el lado "muchos"
+    * Las tablas puente (PURCHASE, INVENTORY_MOVEMENT) se dibujan igual que
+      cualquier otra entidad, ya que en el modelo relacional final SI son
+      tablas reales con su propia llave primaria.
+
+====================================================================
+FIN DEL DOCUMENTO
+====================================================================
